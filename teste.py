@@ -18,6 +18,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+
+path = kagglehub.dataset_download("itsrohithere/renewable-energy-production-dataset-2010-2020")
+print("Pasta:", path)
+print("Arquivos:", os.listdir(path))
+
+for arquivo in glob.glob(os.path.join(path, "**", "*.csv"), recursive=True):
+    df = pd.read_csv(arquivo)
+    nome = os.path.splitext(os.path.basename(arquivo))[0]
+    print(nome, df.shape)
+    print(df.columns.tolist())
+    df.to_excel(f"{nome}.xlsx", index=False)
+
+
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 200)
 
@@ -106,5 +119,10 @@ def rodar_cenario(test_size):
 
 resultados = [rodar_cenario(0.40), rodar_cenario(0.15)]
 
-print("\nComparação entre cenários:")
-print(pd.DataFrame(resultados).round(4).to_string(index=False))
+df_resultados = pd.DataFrame(resultados).round(4)
+print("\nComparacao entre cenarios:")
+print(df_resultados.to_string(index=False))
+
+with pd.ExcelWriter("resultados_sprint04.xlsx") as writer:
+    df_resultados.to_excel(writer, sheet_name="Metricas", index=False)
+    corr.round(4).to_excel(writer, sheet_name="Correlacao")
